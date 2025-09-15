@@ -198,6 +198,8 @@ def flatten_ticket_data(tickets, headers, base_url):
             if match:
                 hp_now_ticket_value = match.group(1).strip()
         flattened_ticket['HP Now Ticket #'] = hp_now_ticket_value
+        flattened_ticket['Type'] = ticket.get('type', {}).get('name', 'N/A')
+        flattened_ticket['Subtype'] = ticket.get('subType', {}).get('name', 'N/A')
         for key, value in ticket.items():
             if isinstance(value, dict) and 'name' in value:
                 flattened_ticket[key] = value['name']
@@ -923,7 +925,9 @@ def input_tickets_page():
                     'CheckInTime': check_in_time_str if check_in_time_str else "09:00 AM",
                     'CheckOutDate': check_out_date_obj,
                     'CheckOutTime': check_out_time_str,
-                    'Multiplier': multiplier_calculated}
+                    'Multiplier': multiplier_calculated,
+                    'Type': flattened_ticket.get('Type', 'N/A'),
+                    'Subtype': flattened_ticket.get('Subtype', 'N/A')}
                 st.session_state.actions_taken = actions_taken
             else:
                 st.error(f"Could not find ticket with ID: {ticket_id_to_search} or notes. Please try again.")
@@ -989,7 +993,9 @@ def input_tickets_page():
                     'HPID': form_data['HPID'],
                     'SURYLID': form_data['SURYLID'],
                     'Multiplier': multiplier,
-                    'Priority': form_data['Priority']}
+                    'Priority': form_data['Priority'],
+                    'Type': form_data['Type'],
+                    'Subtype': form_data['Subtype']}
                 supabase_success = False
                 if supabase:
                     with st.spinner("Inserting data into Supabase..."):
@@ -1026,4 +1032,5 @@ PAGES = {
     "Input Tickets": input_tickets_page,}
 st.sidebar.title("Navigation")
 page_selection = st.sidebar.radio("Go to", list(PAGES.keys()))
+
 PAGES[page_selection]()
