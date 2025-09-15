@@ -200,6 +200,7 @@ def flatten_ticket_data(tickets, headers, base_url):
         flattened_ticket['HP Now Ticket #'] = hp_now_ticket_value
         flattened_ticket['Type'] = ticket.get('type', {}).get('name', 'N/A')
         flattened_ticket['Subtype'] = ticket.get('subType', {}).get('name', 'N/A')
+        flattened_ticket['Item'] = ticket.get('Item', {}).get('name', 'N/A')
         for key, value in ticket.items():
             if isinstance(value, dict) and 'name' in value:
                 flattened_ticket[key] = value['name']
@@ -534,7 +535,7 @@ def connectwise_page():
                         ('status', 'Status'),
                         ('type', 'Type'),
                         ('subType', 'SubType'),
-                        ('item', 'Itam'),
+                        ('Item', 'Item'),
                         ('priority', 'Priority'),
                         ('CW-Technician Name (Custom Field)', 'Technician Name'),
                         ('Check in Date', 'Check In Date'),
@@ -927,7 +928,8 @@ def input_tickets_page():
                     'CheckOutTime': check_out_time_str,
                     'Multiplier': multiplier_calculated,
                     'Type': flattened_ticket.get('Type', 'N/A'),
-                    'Subtype': flattened_ticket.get('Subtype', 'N/A')}
+                    'Subtype': flattened_ticket.get('Subtype', 'N/A'),
+                    'Item': flattened_ticket.get('Item', 'N/A')}
                 st.session_state.actions_taken = actions_taken
             else:
                 st.error(f"Could not find ticket with ID: {ticket_id_to_search} or notes. Please try again.")
@@ -995,7 +997,8 @@ def input_tickets_page():
                     'Multiplier': multiplier,
                     'Priority': form_data['Priority'],
                     'Type': form_data['Type'],
-                    'Subtype': form_data['Subtype']}
+                    'Subtype': form_data['Subtype'],
+                    'Item': form_data['Item']}
                 supabase_success = False
                 if supabase:
                     with st.spinner("Inserting data into Supabase..."):
@@ -1034,3 +1037,4 @@ st.sidebar.title("Navigation")
 page_selection = st.sidebar.radio("Go to", list(PAGES.keys()))
 
 PAGES[page_selection]()
+
