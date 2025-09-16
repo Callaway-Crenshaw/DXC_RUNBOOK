@@ -200,7 +200,7 @@ def flatten_ticket_data(tickets, headers, base_url):
         flattened_ticket['HP Now Ticket #'] = hp_now_ticket_value
         flattened_ticket['Type'] = ticket.get('type', {}).get('name', 'N/A')
         flattened_ticket['Subtype'] = ticket.get('subType', {}).get('name', 'N/A')
-        flattened_ticket['Item'] = ticket.get('Item', {}).get('name', 'N/A')
+        flattened_ticket['Item'] = ticket.get('item', {}).get('name', 'N/A')
         for key, value in ticket.items():
             if isinstance(value, dict) and 'name' in value:
                 flattened_ticket[key] = value['name']
@@ -1037,4 +1037,5 @@ st.sidebar.title("Navigation")
 page_selection = st.sidebar.radio("Go to", list(PAGES.keys()))
 
 PAGES[page_selection]()
+
 
