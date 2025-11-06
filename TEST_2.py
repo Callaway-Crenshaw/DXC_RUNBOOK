@@ -319,7 +319,7 @@ def get_technicians_by_site(site_code):
             parts = full_name.split()
             first_name = parts[0]
             last_name = parts[-1]
-            response_tech_info = supabase.table('TECH INFORMATION').select('FIRST_NAME, LAST_NAME, PHONE_NUMBER, FIELD_NATION_ID, SURYL_EMAIL').eq('FIRST_NAME', first_name).eq('LAST_NAME', last_name).eq('SITE', site_code).execute()
+            response_tech_info = supabase.table('TECH INFORMATION').select('FIRST_NAME, LAST_NAME, PHONE_NUMBER, FIELD_NATION_ID, SURYL_EMAIL, BADGE_NUMBER').eq('FIRST_NAME', first_name).eq('LAST_NAME', last_name).eq('SITE', site_code).execute()
             if response_tech_info.data:
                 tech_data.append(response_tech_info.data[0])
         if tech_data:
@@ -773,10 +773,12 @@ def runbook_page():
                         full_name = f"{selected_tech['FIRST_NAME']} {selected_tech['LAST_NAME']}"
                         sury_email = selected_tech['SURYL_EMAIL']
                         tech_id_to_send = selected_tech['FIELD_NATION_ID']
+                        badge_number = selected_tech['BADGE_NUMBER']
                         
                         note_text = (
                             f"Name: {full_name}\n"
                             f"Mail: {sury_email}\n"
+                            f"Badge Number: {badge_number}\n"
                             f"ETA: {eta}")
                         with st.spinner("Adding discussion note to ticket..."):
                             note_result = add_connectwise_ticket_note(auth_headers, base_url, st.session_state.current_ticket_id, note_text)
@@ -1037,5 +1039,6 @@ st.sidebar.title("Navigation")
 page_selection = st.sidebar.radio("Go to", list(PAGES.keys()))
 
 PAGES[page_selection]()
+
 
 
