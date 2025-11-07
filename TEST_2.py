@@ -324,7 +324,7 @@ def get_technicians_by_site(site_code):
                 tech_data.append(response_tech_info.data[0])
         if tech_data:
             df = pd.DataFrame(tech_data)
-            display_df = df[['FIRST_NAME', 'LAST_NAME', 'PHONE_NUMBER', 'FIELD_NATION_ID', 'SURYL_EMAIL']]
+            display_df = df[['FIRST_NAME', 'LAST_NAME', 'PHONE_NUMBER', 'FIELD_NATION_ID', 'SURYL_EMAIL', 'BADGE_NUMBER']]
             return display_df
         return pd.DataFrame()
     except Exception as e:
@@ -724,7 +724,8 @@ def runbook_page():
                 tech_df = get_technicians_by_site(site_code)
                 st.session_state.tech_df = tech_df
             if tech_df is not None and not tech_df.empty:
-                st.dataframe(tech_df.drop('SURYL_EMAIL', axis=1), hide_index=True)
+                columns_to_drop = ['SURYL_EMAIL', 'BADGE_NUMBER']
+                st.dataframe(tech_df.drop(columns=columns_to_drop, axis=1, errors='ignore'), hide_index=True)
             else:
                 st.info(f"No badged technicians found for site code '{site_code}'.")
         else:
@@ -1039,6 +1040,7 @@ st.sidebar.title("Navigation")
 page_selection = st.sidebar.radio("Go to", list(PAGES.keys()))
 
 PAGES[page_selection]()
+
 
 
 
