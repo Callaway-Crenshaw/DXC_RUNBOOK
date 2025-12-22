@@ -745,18 +745,43 @@ def runbook_page():
                     if not eta:
                         st.error("Please enter an ETA.")
                     else:
-                        try:
-                            parsed_datetime = datetime.strptime(eta.strip(), "%m/%d, %I:%M%p")
-                        except ValueError:
+                        # Try to parse with year first, then fall back to without year
+                        parsed_datetime = None
+                        year_provided = False
+                        
+                        # Try formats with year
+                        for fmt in ["%m/%d/%y, %I:%M%p", "%m/%d/%y, %I%p", "%m/%d/%Y, %I:%M%p", "%m/%d/%Y, %I%p"]:
                             try:
-                                parsed_datetime = datetime.strptime(eta.strip(), "%m/%d, %I%p")
+                                parsed_datetime = datetime.strptime(eta.strip(), fmt)
+                                year_provided = True
+                                break
                             except ValueError:
-                                st.error("Invalid ETA format. Please use 'MM/DD, HPM' (e.g., '9/13, 1PM') or 'MM/DD, H:MM PM' (e.g., '8/12, 12:30PM').")
-                                return
-                        current_year = datetime.now().year
-                        start_datetime = parsed_datetime.replace(year=current_year)
-                        if start_datetime < datetime.now():
-                            start_datetime = start_datetime.replace(year=current_year + 1)
+                                continue
+                        
+                        # If no year was provided, try formats without year
+                        if not parsed_datetime:
+                            for fmt in ["%m/%d, %I:%M%p", "%m/%d, %I%p"]:
+                                try:
+                                    parsed_datetime = datetime.strptime(eta.strip(), fmt)
+                                    break
+                                except ValueError:
+                                    continue
+                        
+                        if not parsed_datetime:
+                            st.error("Invalid ETA format. Please use 'MM/DD/YY, HPM' (e.g., '1/25/26, 2PM') or 'MM/DD, HPM' (e.g., '1/25, 2PM').")
+                            return
+                        
+                        # If year wasn't provided, determine the correct year
+                        if not year_provided:
+                            current_year = datetime.now().year
+                            start_datetime = parsed_datetime.replace(year=current_year)
+                            
+                            # If the scheduled date is in the past, assume it's meant for next year
+                            if start_datetime < datetime.now():
+                                start_datetime = start_datetime.replace(year=current_year + 1)
+                        else:
+                            start_datetime = parsed_datetime
+                        
                         new_date_str = start_datetime.strftime("%A, %B %d, %Y")
                         new_date_str = new_date_str.replace(" 0", " ")                        
                         current_summary = st.session_state.current_ticket_data.get('summary', '')
@@ -1044,6 +1069,7 @@ st.sidebar.title("Navigation")
 page_selection = st.sidebar.radio("Go to", list(PAGES.keys()))
 
 PAGES[page_selection]()
+
 
 
 
