@@ -380,6 +380,8 @@ def update_ticket_dates(eta_string, ticket_id):
             return
     current_year = datetime.now().year
     start_datetime = parsed_datetime.replace(year=current_year)
+    if start_datetime < datetime.now():
+        start_datetime = start_datetime.replace(year=current_year + 1)
     end_datetime = start_datetime + timedelta(hours=2)
     start_date_str = start_datetime.strftime("%Y-%m-%dT00:00:00Z")
     end_date_str = end_datetime.strftime("%Y-%m-%dT00:00:00Z")
@@ -753,6 +755,8 @@ def runbook_page():
                                 return
                         current_year = datetime.now().year
                         start_datetime = parsed_datetime.replace(year=current_year)
+                        if start_datetime < datetime.now():
+                            start_datetime = start_datetime.replace(year=current_year + 1)
                         new_date_str = start_datetime.strftime("%A, %B %d, %Y")
                         new_date_str = new_date_str.replace(" 0", " ")                        
                         current_summary = st.session_state.current_ticket_data.get('summary', '')
@@ -1040,6 +1044,7 @@ st.sidebar.title("Navigation")
 page_selection = st.sidebar.radio("Go to", list(PAGES.keys()))
 
 PAGES[page_selection]()
+
 
 
 
