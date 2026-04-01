@@ -727,7 +727,7 @@ def runbook_page():
                 st.session_state.tech_df = tech_df
             if tech_df is not None and not tech_df.empty:
                 columns_to_drop = ['SURYL_EMAIL', 'BADGE_NUMBER']
-                st.dataframe(tech_df.drop(columns=columns_to_drop, axis=1, errors='ignore'), hide_index=True)
+                st.dataframe(tech_df.drop(columns=columns_to_drop, errors='ignore'), hide_index=True)
             else:
                 st.info(f"No badged technicians found for site code '{site_code}'.")
         else:
